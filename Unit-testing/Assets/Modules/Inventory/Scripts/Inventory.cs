@@ -21,7 +21,7 @@ namespace Modules.Inventories
         private readonly Dictionary<int, KeyValuePair<Item, Vector2Int>> idToItem = new ();
 
         private readonly int noItemInCellId = -1;
-        private readonly Vector2Int noItemInCellPosition = new Vector2Int(-1, -1);
+        private readonly Vector2Int noItemInCellPosition = Vector2Int.zero;
 
         public Inventory(int width, int height)
         {
@@ -138,22 +138,26 @@ namespace Modules.Inventories
 
         public bool CanAddItem(Item item, int startX, int startY)
         {
-            CheckItemValidity(item);
-
-            if (Contains(item))
-            {
-                return false;
-            }
-
             try
             {
+                CheckItemValidity(item);
+
+                if (Contains(item))
+                {
+                    return false;
+                }
+                
                 if (!CheckPositionInInventoryWithExceptions(startX, startY) ||
                     !CheckPositionInInventory(startX + item.Size.x - 1,startY + item.Size.y - 1)) 
                 {
                     return false;
                 }
             }
-            catch (Exception e)
+            catch (ArgumentNullException e)
+            {
+                return false;
+            }
+            catch (IndexOutOfRangeException e)
             {
                 return false;
             }
@@ -233,6 +237,7 @@ namespace Modules.Inventories
         /// </summary>
         public bool FindFreePosition(Item item, out Vector2Int position)
         {
+            CheckItemValidity(item);
             return FindFreePosition(item.Size, out position);
         }
 
@@ -243,13 +248,17 @@ namespace Modules.Inventories
 
         public bool FindFreePosition(int sizeX, int sizeY, out Vector2Int position)
         {
+            if (sizeX <= 0 || sizeY <= 0)
+            {
+                throw new ArgumentException("Size should be positive value");
+            }
             position = noItemInCellPosition;
             int startX = 0, startY = 0;
             int lastX = Width - sizeX, lastY = Height - sizeY;
-            while (startX < lastX)
+            while (startY <= lastY)
             {
-                startY = 0;
-                while (startY < lastY)
+                startX = 0;
+                while (startX <= lastX)
                 {
                     if (IsFreeSpace(startX, startY, startX + sizeX, startY + sizeY,
                             out int x,
@@ -260,10 +269,10 @@ namespace Modules.Inventories
                         return true;
                     }
 
-                    startY = y + 1;
+                    startX = x + 1;
                 }
 
-                startX++;
+                startY++;
             }
             return false;
         }
@@ -389,6 +398,10 @@ namespace Modules.Inventories
 
         public Item GetItem(int x, int y)
         {
+            if (!CheckPositionInInventoryWithExceptions(x, y))
+            {
+                return null;
+            }
             TryGetItem(x, y, out var item);
             return item;
         }
@@ -473,8 +486,11 @@ namespace Modules.Inventories
                 }
             }
 
-            idToItem.Clear();
-            OnCleared?.Invoke();
+            if (idToItem.Count > 0)
+            {
+                idToItem.Clear();
+                OnCleared?.Invoke();
+            }
         }
 
         /// <summary>
@@ -496,10 +512,7 @@ namespace Modules.Inventories
 
         public bool MoveItem(Item item, Vector2Int position)
         {
-            if (item == null)
-            {
-                return false;
-            }
+            CheckItemValidity(item);
 
             if (!Contains(item))
             {
@@ -531,8 +544,27 @@ namespace Modules.Inventories
                 }
             }
 
-            RemoveItem(item);
-            AddItemInternally(item, position.x, position.y);
+            var currentPosition = idToItem[item.Id].Value;
+            for (int i = currentPosition.x; i <= currentPosition.x + item.Size.x; ++i)
+            {
+                for (int j = currentPosition.y; j <= currentPosition.y + item.Size.y; ++j)
+                {
+                    if (IsOccupied(i, j ) && internalArray[i, j] != item.Id)
+                    {
+                        return false;
+                    }
+                }
+            }
+
+            for (int i = position.x; i <= position.x + item.Size.x; ++i)
+            {
+                for (int j = position.y; j <= position.y + item.Size.y; ++j)
+                {
+                    internalArray[i, j] = item.Id;
+                }
+            }
+
+            idToItem[item.Id] = new KeyValuePair<Item, Vector2Int>(item, position);
             OnMoved?.Invoke(item, position);
             return true;
         }
