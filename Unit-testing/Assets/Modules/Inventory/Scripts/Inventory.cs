@@ -187,6 +187,7 @@ namespace Modules.Inventories
             }
 
             AddItemInternally(item, startX, startY);
+            OnAdded?.Invoke(item, new Vector2Int(startX, startY));
             return true;
         }
 
@@ -229,6 +230,7 @@ namespace Modules.Inventories
             }
 
             AddItemInternally(item, freePosition.x, freePosition.y);
+            OnAdded?.Invoke(item, freePosition);
             return true;
         }
 
@@ -287,9 +289,8 @@ namespace Modules.Inventories
                 }
             }
 
-            idToItem.Add(item.Id,
-                new KeyValuePair<Item, Vector2Int>(item, new Vector2Int(startX, startY)));
-            OnAdded?.Invoke(item, new Vector2Int(startX, startY));
+            idToItem[item.Id] =
+                new KeyValuePair<Item, Vector2Int>(item, new Vector2Int(startX, startY));
         }
 
         private bool IsFreeSpace(int startX, int startY, int endX, int endY, out int firstOccupiedX, out int firstOccupiedY)
@@ -574,8 +575,53 @@ namespace Modules.Inventories
         /// </summary>
         public void OptimizeSpace()
         {
-            throw new NotImplementedException();
+            Item[] currentItems = new Item[idToItem.Count];
+            int idx = 0;
+            foreach (var (id, (item, position)) in idToItem)
+            {
+                currentItems[idx] = item;
+                idx++;
+            }
+            
+            Array.Sort(currentItems, new InternalItemComparator());
+
+            for (int i = 0; i < Width; ++i)
+            {
+                for (int j = 0; j < Height; ++j)
+                {
+                    internalArray[i, j] = noItemInCellId;
+                }
+            }
+
+            for (int i = 0; i < idToItem.Count; ++i)
+            {
+                var item = currentItems[i];
+                FindFreePosition(item, out var position);
+                AddItemInternally(item, position.x, position.y);
+            }
         }
+        
+        private class InternalItemComparator : IComparer<Item>
+        {
+            public int Compare(Item i1, Item i2)
+            {
+                if (i1 == null)
+                {
+                    return -1;
+                }
+
+                if (i2 == null)
+                {
+                    return 1;
+                }
+                
+                int s1 = i1.Size.x * i1.Size.y;
+                int s2 = i2.Size.x * i2.Size.y;
+
+                return s1 == s2 ? 0 : (s1 < s2 ? 1 : -1);
+            }
+        }
+        
 
         private bool CheckPositionInInventory(int x, int y)
         {
@@ -663,7 +709,23 @@ namespace Modules.Inventories
         /// </summary>
         public override string ToString()
         {
-            throw new NotImplementedException();
+            string[,] itemNames = new string[Width, Height];
+            for (int i = 0; i < Width; ++i)
+            {
+                for (int j = 0; j < Height; ++j)
+                {
+                    if (!IsOccupied(i, j))
+                    {
+                        itemNames[i, j] = "null";
+                    }
+                    else
+                    {
+                        itemNames[i, j] = idToItem[internalArray[i, j]].Key.Name;
+                    }
+                }
+            }
+
+            return itemNames.ToString();
         }
 
         public class InventoryEnumerator : IEnumerator<Item>
