@@ -1,5 +1,6 @@
 using System;
 using DG.Tweening;
+using Game.Characters;
 using UnityEngine;
 
 namespace Game
@@ -7,8 +8,8 @@ namespace Game
     // +
     public abstract class ShipController : MonoBehaviour
     {
-        public event Action<int> OnHealthChanged;
-        public event Action OnDead;
+        
+        
 
         public event Action<ShipController> OnFire;
 
@@ -25,7 +26,7 @@ namespace Game
 
         [Header("Movement")]
         [SerializeField]
-        protected Motor _motor;
+        protected MovementAgent movementAgent;
         
         protected Vector3 moveDirection;
 
@@ -58,13 +59,13 @@ namespace Game
         private void Awake()
         {
             this.currentHealth = config.Health;
-            _motor.SetSpeed(config.MoveSpeed);
+            movementAgent.SetSpeed(config.MoveSpeed);
 
             _material = new Material(_viewConfig.MaterialPrefab);
             _renderer.material = _material;
         }
 
-        protected virtual void FixedUpdate() => _motor.FixedUpdate();
+        protected virtual void FixedUpdate() => movementAgent.FixedUpdate();
 
         protected void Fire()
         {

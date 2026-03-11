@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Game.Characters;
 using Modules.UI;
 using Modules.Utils;
 using UnityEngine;
@@ -117,7 +118,7 @@ namespace Game
                 direction,
                 enemy.bulletSpeed,
                 enemy.bulletDamage,
-                TeamType.Enemy
+                Faction.Enemy
             );
         }
         

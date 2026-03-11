@@ -28,7 +28,7 @@ namespace Game
                 _player.firePoint.up,
                 _player.bulletSpeed,
                 _player.bulletDamage,
-                TeamType.Player
+                Faction.Player
             );
         }
     }

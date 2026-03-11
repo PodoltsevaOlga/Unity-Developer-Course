@@ -51,7 +51,7 @@ namespace Game
 
             if (this.currentHealth > 0)
             {
-                _motor.MoveStep(this.moveDirection);
+                movementAgent.MoveStep(this.moveDirection);
             }
         }
 

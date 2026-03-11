@@ -1,7 +1,6 @@
 ﻿namespace Game
 {
-    // +
-    public enum TeamType
+    public enum Faction
     {
         None = 0,
         Player = 1,

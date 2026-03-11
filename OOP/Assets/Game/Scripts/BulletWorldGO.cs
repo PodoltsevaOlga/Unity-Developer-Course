@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using Game.Characters;
+using Game.Projectiles;
 using Modules.Utils;
 using UnityEngine;
 
@@ -9,7 +11,7 @@ namespace Game
     public sealed class BulletWorldGO : MonoBehaviour
     {
         [SerializeField]
-        private BulletData _prefab;
+        private ProjectileConfig _prefab;
 
         [SerializeField]
         private Transform _container;
@@ -20,14 +22,14 @@ namespace Game
         [SerializeField]
         private TransformBounds _levelBounds;
 
-        private readonly Stack<BulletData> _pool = new();
-        private readonly List<BulletData> _bullets = new();
+        private readonly Stack<ProjectileConfig> _pool = new();
+        private readonly List<ProjectileConfig> _bullets = new();
 
         private void Awake()
         {
             for (var i = 0; i < 10; i++)
             {
-                BulletData bullet = Instantiate(_prefab, _container);
+                ProjectileConfig bullet = Instantiate(_prefab, _container);
                 bullet.gameObject.SetActive(false);
                 _pool.Push(bullet);
             }
@@ -37,7 +39,7 @@ namespace Game
         {
             for (int i = _bullets.Count - 1; i >= 0; i--)
             {
-                BulletData bullet = _bullets[i];
+                ProjectileConfig bullet = _bullets[i];
                 Vector3 moveStep = bullet.direction * bullet.speed * Time.fixedDeltaTime;
                 bullet.transform.position += moveStep;
 
@@ -52,29 +54,29 @@ namespace Game
             }
         }
 
-        public void Spawn(Vector2 position, Vector2 direction, float speed, int damage, TeamType team)
+        public void Spawn(Vector2 position, Vector2 direction, float speed, int damage, Faction team)
         {
-            if (_pool.TryPop(out BulletData bullet))
+            if (_pool.TryPop(out ProjectileConfig bullet))
                 bullet.gameObject.SetActive(true);
             else
                 bullet = Instantiate(_prefab, _container);
             
             bullet.direction = direction;
             bullet.speed = speed;
-            bullet.damage = damage;
-            bullet.team = team;
+            bullet.Damage = damage;
+            bullet.OwnerFaction = team;
 
             bullet.transform.position = position;
             bullet.transform.rotation = Quaternion.LookRotation(direction, Vector3.forward);
             bullet.gameObject.layer = team switch
             {
-                TeamType.None => LayerMask.NameToLayer("Default"),
-                TeamType.Player => LayerMask.NameToLayer("PlayerBullet"),
-                TeamType.Enemy => LayerMask.NameToLayer("EnemyBullet"),
+                Faction.None => LayerMask.NameToLayer("Default"),
+                Faction.Player => LayerMask.NameToLayer("PlayerBullet"),
+                Faction.Enemy => LayerMask.NameToLayer("EnemyBullet"),
                 _ => throw new ArgumentOutOfRangeException(nameof(team), team, null)
             };
 
-            if (team == TeamType.Player)
+            if (team == Faction.Player)
             {
                 bullet.blueVFX.SetActive(true);
                 bullet.redVFX.SetActive(false);
@@ -89,18 +91,18 @@ namespace Game
             _bullets.Add(bullet);
         }
 
-        private void OnTriggerEntered(BulletData bullet, Collider2D other)
+        private void OnTriggerEntered(ProjectileConfig bullet, Collider2D other)
         {
             if (!other.TryGetComponent(out ShipController ship)) 
                 return;
 
-            if (bullet.team == TeamType.Player && ship is Enemy ||
-                bullet.team == TeamType.Enemy && ship is PlayerShip)
+            if (bullet.OwnerFaction == Faction.Player && ship is Enemy ||
+                bullet.OwnerFaction == Faction.Enemy && ship is PlayerShip)
             {
                 // Deal damage to target:
-                if (bullet.damage > 0)
+                if (bullet.Damage > 0)
                 {
-                    ship.currentHealth = Mathf.Clamp(ship.currentHealth - bullet.damage, 0, ship.config.Health);
+                    ship.currentHealth = Mathf.Clamp(ship.currentHealth - bullet.Damage, 0, ship.config.Health);
                     ship.NotifyAboutHealthChanged(ship.currentHealth);
  
                     if (ship.currentHealth <= 0)
