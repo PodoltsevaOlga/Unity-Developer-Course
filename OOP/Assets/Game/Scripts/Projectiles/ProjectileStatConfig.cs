@@ -3,8 +3,8 @@ using UnityEngine;
 namespace Game.Projectiles
 {
     [CreateAssetMenu(
-        fileName = "ProjectileConfig",
-        menuName = "Game/New ProjectileConfig"
+        fileName = "ProjectileStatConfig",
+        menuName = "Game/New ProjectileStatConfig"
     )]
     public class ProjectileStatConfig : ScriptableObject
     {
@@ -16,16 +16,5 @@ namespace Game.Projectiles
 
         public int Damage => damage;
         public float Speed => speed;
-        
-        
-        //
-        
-        //public event Action<BulletData, Collider2D> OnTriggerEntered;
-        //public Vector2 direction;
-
-        //public GameObject blueVFX;
-        //public GameObject redVFX;
-
-        
     }
 }

@@ -47,7 +47,7 @@ namespace Game.Controllers
 
         private void Awake()
         {
-            enemiesPool = new ObjectPool<Enemy>(enemyPrefab, spawnContainer);
+            enemiesPool = new ObjectPool<Enemy>(enemyPrefab, spawnContainer, 5);
             
             ShuffleSpawnPositions();
             ShuffleAttackPositions();

@@ -1,4 +1,5 @@
-﻿using Game.Characters;
+﻿using System;
+using Game.Characters;
 using Modules.UI;
 using UnityEngine;
 
@@ -11,6 +12,11 @@ namespace Game.UI
 
         [SerializeField] 
         private Player player;
+
+        private void Start()
+        {
+            healthView.SetHealth(player.CurrentHealth, player.MaxHealth);
+        }
 
         private void OnEnable()
         {

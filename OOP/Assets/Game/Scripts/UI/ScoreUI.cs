@@ -12,6 +12,11 @@ namespace Game.UI
         [SerializeField] 
         private ScoreView scoreView;
 
+        private void Start()
+        {
+            scoreView.SetValue(0);
+        }
+        
         private void OnEnable()
         {
             gameController.OnScoreChanged += OnScoreChanged;

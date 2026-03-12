@@ -1,6 +1,7 @@
 ﻿using System;
 using Game.Characters.CharacterComponents;
 using Game.Projectiles;
+using Modules.Utils;
 using UnityEngine;
 
 namespace Game.Characters
@@ -13,6 +14,8 @@ namespace Game.Characters
         protected CharacterShipStatConfig statConfiguration;
         [SerializeField] 
         protected Rigidbody2D shipRigidbody;
+        [SerializeField] 
+        protected TransformBounds allowedArea;
         
         public virtual Faction CharacterFaction => Faction.None;
 
@@ -30,7 +33,7 @@ namespace Game.Characters
             health = new Health(statConfiguration.MaxHealth);
             movementAgent = new MovementAgent(shipRigidbody, statConfiguration.MoveSpeed,
                 statConfiguration.MoveRotationAngle, statConfiguration.StoppingDistance,
-                statConfiguration.AllowedArea);
+                allowedArea);
             weapon.Setup(this);
             OnAwake();
         }

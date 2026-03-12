@@ -17,15 +17,22 @@ namespace Game.Utils
             initialSize = Math.Max(0, initialSize);
             for (int i = 0; i < initialSize; ++i)
             {
-                objects.Push(GameObject.Instantiate(objectPrefab, container));
+                InstantiateObject();
             }
+        }
+
+        private void InstantiateObject()
+        {
+            var newObj = GameObject.Instantiate(objectPrefab, container);
+            newObj.gameObject.SetActive(false);
+            objects.Push(newObj);
         }
 
         public T GetObject()
         {
             if (objects.Count == 0)
             {
-                objects.Push(GameObject.Instantiate(objectPrefab, container));
+                InstantiateObject();
             }
             var obj = objects.Pop();
             obj.transform.SetParent(null);

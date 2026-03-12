@@ -77,7 +77,7 @@ namespace Game.Projectiles
         {
             var viewPos = Camera.main.WorldToViewportPoint(transform.position);
             return (viewPos.x < -outOfCameraViewDistance ||
-                    viewPos.x > 1 + outOfCameraViewDistance) &&
+                    viewPos.x > 1 + outOfCameraViewDistance) ||
                    (viewPos.y < -outOfCameraViewDistance ||
                     viewPos.y > 1 + outOfCameraViewDistance);
         }

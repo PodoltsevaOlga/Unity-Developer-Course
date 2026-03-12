@@ -10,6 +10,8 @@ namespace Game.Projectiles
         [SerializeField] 
         private ProjectileViewConfig viewConfiguration;
 
+        [SerializeField] private Transform visualContainer;
+
         private void Awake()
         {
             projectileData = GetComponent<Projectile>();
@@ -17,7 +19,7 @@ namespace Game.Projectiles
             {
                 if (viewConfiguration.ProjectileVFX != null)
                 {
-                    Instantiate(viewConfiguration.ProjectileVFX, transform);
+                    Instantiate(viewConfiguration.ProjectileVFX, visualContainer);
                 }
 
                 explosionPrefab = viewConfiguration.ExplosionPrefab;

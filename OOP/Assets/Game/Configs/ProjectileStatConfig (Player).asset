@@ -9,9 +9,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 072d2ba2b8554d2f9cee8304b9932c09, type: 3}
-  m_Name: SpaceShip (Player)
-  m_EditorClassIdentifier: 
-  <Health>k__BackingField: 10
-  <MoveSpeed>k__BackingField: 7
-  <FireCooldown>k__BackingField: 0.25
+  m_Script: {fileID: 11500000, guid: a4f04ddcf68e44c1b95a5d6ea04d1a4a, type: 3}
+  m_Name: ProjectileStatConfig (Player)
+  m_EditorClassIdentifier: Game::Game.Projectiles.ProjectileStatConfig
+  damage: 1
+  speed: 1

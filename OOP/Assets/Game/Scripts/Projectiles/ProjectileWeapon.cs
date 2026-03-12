@@ -20,6 +20,9 @@ namespace Game.Projectiles
         private ProjectileStatConfig projectileStatConfig;
         
         [SerializeField]
+        private Transform projectilesContainer;
+        
+        [SerializeField]
         private Transform firePoint;
 
         private float lastFireTime;
@@ -32,7 +35,7 @@ namespace Game.Projectiles
 
         private void Awake()
         {
-            projectilePool = new ObjectPool<Projectile>(projectilePrefab, transform, 5);
+            projectilePool = new ObjectPool<Projectile>(projectilePrefab, projectilesContainer, 5);
         }
 
         private void OnDestroy()
@@ -68,10 +71,11 @@ namespace Game.Projectiles
         private void SpawnProjectile(Vector3 targetPosition)
         {
             var projectile = projectilePool.GetObject();
-            projectile.transform.SetParent(transform);
+            projectile.transform.SetParent(projectilesContainer);
             projectile.transform.position = firePoint.position;
             projectile.Setup(projectileStatConfig, owner.Faction);
             projectile.SetDirection(targetPosition - firePoint.position);
+            projectile.gameObject.SetActive(true);
             switch (owner.Faction)
             {
                 case Faction.Enemy:

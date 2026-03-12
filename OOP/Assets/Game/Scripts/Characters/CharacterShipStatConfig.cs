@@ -19,8 +19,5 @@ namespace Game.Characters
         
         [field: SerializeField]
         public float StoppingDistance { get; private set; }= 0.25f;
-        
-        [field: SerializeField]
-        public TransformBounds AllowedArea { get; private set; }
     }
 }

@@ -7,6 +7,9 @@ namespace Game.Controllers
     {
         [SerializeField] 
         private Player player;
+
+        [SerializeField] 
+        private KeyCode fireButton = KeyCode.Space;
         
         private void Update()
         {
@@ -15,7 +18,7 @@ namespace Game.Controllers
                 return;
             }
             
-            if (Input.GetKeyDown(KeyCode.Space)) 
+            if (Input.GetKeyDown(fireButton)) 
                 player.RequestFire();
             
             float dx = Input.GetAxisRaw("Horizontal");
