@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using Game.Characters.CharacterComponents;
 using Game.Projectiles;
 using Modules.Utils;
@@ -64,13 +65,10 @@ namespace Game.Characters
         {
             if (health.ApplyDamage(damage))
             {
+                OnHealthChanged?.Invoke(health.CurrentHealthPoints);
                 if (health.CurrentHealthPoints <= 0)
                 {
                     Die();
-                }
-                else
-                {
-                    OnHealthChanged?.Invoke(health.CurrentHealthPoints);
                 }
             }
         }
@@ -79,6 +77,13 @@ namespace Game.Characters
 
         protected virtual void OnDying()
         {
+            StartCoroutine(DisableNextFrame());
+        }
+        
+        private IEnumerator DisableNextFrame()
+        {
+            yield return null;
+            yield return null;
             gameObject.SetActive(false);
         }
 
