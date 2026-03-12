@@ -2,7 +2,7 @@
 using Game.Characters;
 using UnityEngine;
 
-namespace Game.CharacterControllers
+namespace Game.Controllers
 {
     public class GameController : MonoBehaviour
     {
@@ -18,7 +18,6 @@ namespace Game.CharacterControllers
         private EnemySpawner enemySpawner;
 
         public int Score { get; private set; }
-
 
         private void Start()
         {
@@ -45,14 +44,14 @@ namespace Game.CharacterControllers
             OnGameStart?.Invoke();
         }
 
-        private void OnCharacterDie(Character character)
+        private void OnCharacterDie(CharacterShip characterShip)
         {
-            if (character == player)
+            if (characterShip == player)
             {
                 player.OnDead -= OnCharacterDie;
                 GameOver();
             }
-            else if (character.CharacterFaction == Faction.Enemy)
+            else if (characterShip.CharacterFaction == Faction.Enemy)
             {
                 Score++;
                 OnScoreChanged?.Invoke(Score);

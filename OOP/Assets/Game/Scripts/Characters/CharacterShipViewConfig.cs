@@ -1,10 +1,9 @@
 using UnityEngine;
 
-namespace Game
+namespace Game.Characters
 {
-    // +
-    [CreateAssetMenu(menuName = "Game/ShipControllerViewConfig", order = 0)]
-    public sealed class ShipControllerViewConfig : ScriptableObject
+    [CreateAssetMenu(menuName = "Game/New CharacterShipViewConfig")]
+    public sealed class CharacterShipViewConfig : ScriptableObject
     {
         [field: SerializeField]
         public Material MaterialPrefab { get; private set; }
@@ -18,13 +17,6 @@ namespace Game
 
         [field: SerializeField]
         public float HitDuration { get; private set; } = 0.2f;
-        
-        [Header("Move")]
-        [field: SerializeField]
-        public float MoveRotationAngle { get; private set; } = 30f;
-
-        [field: SerializeField]
-        public float MoveSpeed { get; private set; } = 5;
 
         [Header("Destroy")]
         [field: SerializeField]

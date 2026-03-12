@@ -1,19 +1,21 @@
 ﻿using System;
 using UnityEngine;
 
-namespace Game.Characters
+namespace Game.Characters.CharacterComponents
 {
-    public class Health : MonoBehaviour, IResetComponent
+    public class Health : IResetComponent
     {
         [SerializeField] 
-        private int maxHealthPoints = 10;
+        private int maxHealthPoints = 5;
         private int currentHealthPoints;
 
         public int CurrentHealthPoints => currentHealthPoints;
+        public int MaxHealthPoints => maxHealthPoints;
 
-        private void Awake()
+        public Health(int _maxHealthPoints)
         {
-            ResetValues();
+            maxHealthPoints = _maxHealthPoints;
+            currentHealthPoints = maxHealthPoints;
         }
         
         public void ResetValues()

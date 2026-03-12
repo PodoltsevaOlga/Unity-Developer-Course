@@ -1,18 +1,29 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Game.Projectiles
 {
+    [RequireComponent(typeof(Projectile))]
     public class ProjectileView : MonoBehaviour
     {
         private Projectile projectileData;
-        [SerializeField]
         private GameObject explosionPrefab;
+        [SerializeField] 
+        private ProjectileViewConfig viewConfiguration;
 
         private void Awake()
         {
             projectileData = GetComponent<Projectile>();
+            if (viewConfiguration != null)
+            {
+                if (viewConfiguration.ProjectileVFX != null)
+                {
+                    Instantiate(viewConfiguration.ProjectileVFX, transform);
+                }
+
+                explosionPrefab = viewConfiguration.ExplosionPrefab;
+            }
         }
+        
 
         private void OnEnable()
         {

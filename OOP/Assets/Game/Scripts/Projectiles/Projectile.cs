@@ -1,17 +1,40 @@
 ﻿using System;
 using Game.Characters;
+using Game.Characters.CharacterComponents;
+using Game.Utils;
 using UnityEngine;
 
 namespace Game.Projectiles
 {
-    public class Projectile : MonoBehaviour
+    [RequireComponent(typeof(Collider2D))]
+    public class Projectile : MonoBehaviour, IPoolableObject
     {
-        public event Action<Projectile> OnDealDamage;
-        public Faction OwnerFaction { get; private set; } = Faction.None;
-        
         [SerializeField] 
-        private ProjectileConfig configuration;
-        public ProjectileConfig Configuration => configuration;
+        private float outOfCameraViewDistance = 0.5f;
+        public event Action<Projectile> OnDealDamage;
+        public event Action<Projectile> OnOutOfCameraView;
+        
+        public Faction OwnerFaction { get; private set; } = Faction.None;
+
+        private int damage;
+        private float speed;
+        private Vector2 direction;
+
+        public void Setup(ProjectileStatConfig statConfig, Faction ownerFaction)
+        {
+            damage = statConfig.Damage;
+            speed = statConfig.Speed;
+            OwnerFaction = ownerFaction;
+        }
+        
+        private void FixedUpdate()
+        {
+            Move();
+            if (CheckIsOutOfCameraView())
+            {
+                OnOutOfCameraView?.Invoke(this);
+            }
+        }
 
         private void OnTriggerEnter2D(Collider2D other)
         {
@@ -20,18 +43,43 @@ namespace Game.Projectiles
 
             if (OwnerFaction != Faction.None &&
                 receiver.Faction != Faction.None &&
-                OwnerFaction != receiver.Faction &&
-                Configuration.Damage > 0)
+                OwnerFaction != receiver.Faction)
             {
-                receiver.ReceiveDamage(Configuration.Damage);
+                receiver.ReceiveDamage(damage);
+                OnDealDamage?.Invoke(this);
             }
+        }
 
-            OnDealDamage?.Invoke(this);
+        public void OnActivate()
+        {
+        }
 
+        public void DestroyMyself(Projectile projectile)
+        {
+            if (projectile == this)
+            {
+                Destroy(this);
+            }
+        }
+        
+        public void SetDirection(Vector2 _direction)
+        {
+            direction = _direction;
+        }
 
-                // Explosion Vfx
-              //  GameObject prefab = _configView.ExplosionVFX;
-               // Instantiate(prefab, bullet.transform.position, prefab.transform.rotation);
+        private void Move()
+        {
+            Vector3 moveStep = (Vector3)direction * (speed * Time.fixedDeltaTime);
+            transform.position += moveStep;
+        }
+
+        private bool CheckIsOutOfCameraView()
+        {
+            var viewPos = Camera.main.WorldToViewportPoint(transform.position);
+            return (viewPos.x < -outOfCameraViewDistance ||
+                    viewPos.x > 1 + outOfCameraViewDistance) &&
+                   (viewPos.y < -outOfCameraViewDistance ||
+                    viewPos.y > 1 + outOfCameraViewDistance);
         }
     }
 }

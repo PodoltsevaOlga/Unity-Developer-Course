@@ -6,7 +6,7 @@ namespace Game.Projectiles
         fileName = "ProjectileConfig",
         menuName = "Game/New ProjectileConfig"
     )]
-    public class ProjectileConfig : ScriptableObject
+    public class ProjectileStatConfig : ScriptableObject
     {
         [SerializeField] 
         private int damage;

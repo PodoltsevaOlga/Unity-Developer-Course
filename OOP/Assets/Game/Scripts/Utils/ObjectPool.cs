@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Game.Utils
 {
-    public class ObjectPool<T> where T : MonoBehaviour
+    public class ObjectPool<T> where T : MonoBehaviour, IPoolableObject
     {
         private readonly Stack<T> objects = new Stack<T>();
         private readonly T objectPrefab;
@@ -29,11 +29,16 @@ namespace Game.Utils
             }
             var obj = objects.Pop();
             obj.transform.SetParent(null);
+            obj.OnActivate();
             return obj;
         }
 
         public void ReleaseObject(T obj)
         {
+            if (obj == null)
+            {
+                return;
+            }
             objects.Push(obj);
             obj.gameObject.SetActive(false);
             obj.transform.SetParent(container);

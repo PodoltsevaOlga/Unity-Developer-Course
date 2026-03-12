@@ -6,7 +6,7 @@ using Modules.Utils;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-namespace Game.CharacterControllers
+namespace Game.Controllers
 {
     public class EnemySpawner : MonoBehaviour
     {
@@ -30,11 +30,16 @@ namespace Game.CharacterControllers
         
         [SerializeField] 
         private Player player;
-        
+
+        [SerializeField] 
+        private GameController gameController;
+
         private float currentSpawnCooldown;
         private float lastSpawnTime;
         private int currentSpawnPositionIndex;
         private int currentAttackPositionIndex;
+
+        private bool canSpawn;
 
         private ObjectPool<Enemy> enemiesPool = null;
 
@@ -43,19 +48,27 @@ namespace Game.CharacterControllers
         private void Awake()
         {
             enemiesPool = new ObjectPool<Enemy>(enemyPrefab, spawnContainer);
-            ShuffleSpawnPositions();
             
+            ShuffleSpawnPositions();
+            ShuffleAttackPositions();
+            
+            canSpawn = true;
+            gameController.OnGameOver += () => canSpawn = false;
         }
         
         private void Start()
         {
             ResetSpawnCooldown();
         }
-        
+
         private void FixedUpdate()
         {
+            if (!canSpawn)
+            {
+                return;
+            }
+            
             float time = Time.fixedTime;
-            //if (GameController.isGameActive)
             if (time - lastSpawnTime < currentSpawnCooldown)
                 return;
 
@@ -67,9 +80,10 @@ namespace Game.CharacterControllers
         {
             var enemy = enemiesPool.GetObject();
             enemy.transform.position = NextSpawnPosition();
-            enemy.OnSpawn();
+            enemy.gameObject.SetActive(true);
             enemy.Setup(player, NextAttackPosition());
             enemy.OnDead += DespawnEnemy;
+            gameController.OnGameOver += enemy.ForbidActions;
             OnEnemySpawned?.Invoke(enemy);
             return enemy;
         }
@@ -83,6 +97,7 @@ namespace Game.CharacterControllers
         {
             yield return null;
             enemiesPool.ReleaseObject(enemy);
+            gameController.OnGameOver += enemy.ForbidActions;
         }
         
         private void ResetSpawnCooldown()

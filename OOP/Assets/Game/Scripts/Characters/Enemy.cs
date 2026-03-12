@@ -1,50 +1,66 @@
 using System;
 using System.Collections.Generic;
+using Game.Characters.CharacterComponents;
+using Game.Utils;
 using UnityEngine;
 
 namespace Game.Characters
 {
-    public class Enemy : Character
+    public class Enemy : CharacterShip, IPoolableObject
     {
-        public Character Target { get; private set; }
-
+        public CharacterShip Target { get; private set; }
+        public override Faction CharacterFaction => Faction.Enemy;
+        
         private List<IResetComponent> resetComponents = new();
         public new event Action<Enemy> OnDead;
+        
+        private bool canMakeActions;
 
-        private void Awake()
+        protected override void OnAwake()
         {
             var resetComps = GetComponents<IResetComponent>();
             if (resetComps != null)
             {
                 resetComponents.AddRange(resetComps);
             }
+            resetComponents.Add(health);
+            resetComponents.Add(weapon);
+            
+            base.OnDead += (character) => { (character as Enemy)?.OnDead?.Invoke((Enemy)character); };
         }
 
-        public void OnSpawn()
+        public void ForbidActions()
         {
-            foreach (var resetComponent in resetComponents)
-            {
-                resetComponent.ResetValues();
-            }
-            this.Weapon.ResetValues();
+            canMakeActions = false;
         }
 
-        public void Setup(Character targetCharacter, Vector2 destinationPosition)
+        public void Setup(CharacterShip targetCharacterShip, Vector2 destinationPosition)
         {
-            Target = targetCharacter;
+            Target = targetCharacterShip;
             movementAgent.SetDestination(destinationPosition);
+            canMakeActions = true;
         }
 
         protected override void OnFixedUpdate()
         {
-            if (Target == null || !Target.IsAlive)
+            base.OnFixedUpdate();
+            
+            if (!canMakeActions || Target == null || !Target.IsAlive)
             {
                 return;
             }
 
             if (movementAgent.IsReachedDestination(out var _))
             {
-                this.Weapon.TryToFire();
+                weapon.TryToFire(Target.transform.position);
+            }
+        }
+
+        public void OnActivate()
+        {
+            foreach (var resetComponent in resetComponents)
+            {
+                resetComponent.ResetValues();
             }
         }
     }

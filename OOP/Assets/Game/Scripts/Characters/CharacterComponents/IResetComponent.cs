@@ -1,4 +1,4 @@
-﻿namespace Game.Characters
+﻿namespace Game.Characters.CharacterComponents
 {
     public interface IResetComponent
     {
