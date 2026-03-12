@@ -53,6 +53,10 @@ PrefabInstance:
       value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 5486272580594564371, guid: 81772a4b7d913c9418b862eaaf3e9cb3, type: 3}
+      propertyPath: fireCooldown
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 5486272580594564371, guid: 81772a4b7d913c9418b862eaaf3e9cb3, type: 3}
       propertyPath: projectilePrefab
       value: 
       objectReference: {fileID: 7605172757403233320, guid: b00d29e2deb2c7247b1439817c5dbb03, type: 3}

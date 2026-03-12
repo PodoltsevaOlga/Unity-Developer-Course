@@ -43,12 +43,12 @@ namespace Game.Characters
 
         protected override void OnFixedUpdate()
         {
-            base.OnFixedUpdate();
-            
             if (!canMakeActions || Target == null || !Target.IsAlive)
             {
                 return;
             }
+            
+            movementAgent.OnFixedUpdate();
 
             if (movementAgent.IsReachedDestination(out var _))
             {

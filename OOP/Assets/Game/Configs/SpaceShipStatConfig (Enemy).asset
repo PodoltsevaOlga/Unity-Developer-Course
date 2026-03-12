@@ -13,6 +13,6 @@ MonoBehaviour:
   m_Name: SpaceShipStatConfig (Enemy)
   m_EditorClassIdentifier: Game::Game.Characters.CharacterShipStatConfig
   <MaxHealth>k__BackingField: 2
-  <MoveSpeed>k__BackingField: 5
+  <MoveSpeed>k__BackingField: 3
   <MoveRotationAngle>k__BackingField: 30
-  <StoppingDistance>k__BackingField: 0.25
+  <StoppingDistance>k__BackingField: 0.1

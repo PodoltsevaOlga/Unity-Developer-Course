@@ -13,4 +13,4 @@ MonoBehaviour:
   m_Name: ProjectileStatConfig (Player)
   m_EditorClassIdentifier: Game::Game.Projectiles.ProjectileStatConfig
   damage: 1
-  speed: 1
+  speed: 7

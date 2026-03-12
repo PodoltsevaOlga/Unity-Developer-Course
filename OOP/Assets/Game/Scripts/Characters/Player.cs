@@ -8,12 +8,22 @@ namespace Game.Characters
         
         public void RequestFire()
         {
-            weapon.TryToFire(transform.forward);
+            weapon.TryToFire(null);
         }
 
         public void SetDirection(Vector2 direction)
         {
             movementAgent.SetDirection(direction);
+        }
+
+        protected override void OnLateUpdate()
+        {
+            movementAgent.OnLateUpdate();
+        }
+        
+        protected override void OnFixedUpdate()
+        {
+            movementAgent.OnFixedUpdate();
         }
     }
 }

@@ -15,4 +15,4 @@ MonoBehaviour:
   <MaxHealth>k__BackingField: 10
   <MoveSpeed>k__BackingField: 5
   <MoveRotationAngle>k__BackingField: 15
-  <StoppingDistance>k__BackingField: 0.25
+  <StoppingDistance>k__BackingField: 0.1

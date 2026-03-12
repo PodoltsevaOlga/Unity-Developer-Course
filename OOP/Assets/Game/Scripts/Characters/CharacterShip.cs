@@ -49,7 +49,6 @@ namespace Game.Characters
 
         protected virtual void OnFixedUpdate()
         {
-            movementAgent.OnFixedUpdate();
         }
 
         private void LateUpdate()
@@ -59,7 +58,6 @@ namespace Game.Characters
         
         protected virtual void OnLateUpdate()
         {
-            movementAgent.OnLateUpdate();
         }
 
         public void ReceiveDamage(int damage)

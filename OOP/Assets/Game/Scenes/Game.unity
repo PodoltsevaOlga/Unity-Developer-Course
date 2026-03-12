@@ -1019,6 +1019,7 @@ MonoBehaviour:
   enemyPrefab: {fileID: 102605417607457000, guid: 87fe189881a524806800482ac8eaaa83, type: 3}
   minSpawnCooldown: 2
   maxSpawnCooldown: 3
+  maxAliveEnemies: 5
   spawnPositions:
   - {fileID: 5098186055898699330}
   - {fileID: 3822857799868723767}
@@ -1443,6 +1444,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Game::Game.Controllers.InputController
   player: {fileID: 3559832809919233304}
+  fireButton: 32
 --- !u!1 &883274639
 GameObject:
   m_ObjectHideFlags: 0
@@ -3193,9 +3195,9 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 739865810}
     m_Modifications:
-    - target: {fileID: 264896097144797914, guid: 0446acb84a7c9424d841676cef3b1d04, type: 3}
-      propertyPath: fireCooldown
-      value: 0.5
+    - target: {fileID: 674222152827123765, guid: 0446acb84a7c9424d841676cef3b1d04, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4109394316656653739, guid: 0446acb84a7c9424d841676cef3b1d04, type: 3}
       propertyPath: m_Name
@@ -3240,6 +3242,10 @@ PrefabInstance:
     - target: {fileID: 5706750963508843440, guid: 0446acb84a7c9424d841676cef3b1d04, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6980509597402138279, guid: 0446acb84a7c9424d841676cef3b1d04, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.5
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

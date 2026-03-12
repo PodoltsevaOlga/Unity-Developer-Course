@@ -26,7 +26,7 @@ namespace Game.Projectiles
             }
         }
         
-
+        
         private void OnEnable()
         {
             if (projectileData != null)

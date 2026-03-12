@@ -18,6 +18,9 @@ namespace Game.Controllers
 
         [SerializeField]
         private float maxSpawnCooldown = 3;
+
+        [SerializeField] 
+        private int maxAliveEnemies = 5;
         
         [SerializeField]
         private Transform[] spawnPositions;
@@ -38,6 +41,7 @@ namespace Game.Controllers
         private float lastSpawnTime;
         private int currentSpawnPositionIndex;
         private int currentAttackPositionIndex;
+        private int currentAliveEnemiesCount;
 
         private bool canSpawn;
 
@@ -47,12 +51,13 @@ namespace Game.Controllers
 
         private void Awake()
         {
-            enemiesPool = new ObjectPool<Enemy>(enemyPrefab, spawnContainer, 5);
+            enemiesPool = new ObjectPool<Enemy>(enemyPrefab, spawnContainer, maxAliveEnemies);
             
             ShuffleSpawnPositions();
             ShuffleAttackPositions();
             
             canSpawn = true;
+            currentAliveEnemiesCount = 0;
             gameController.OnGameOver += () => canSpawn = false;
         }
         
@@ -63,13 +68,12 @@ namespace Game.Controllers
 
         private void FixedUpdate()
         {
-            if (!canSpawn)
+            if (!canSpawn || currentAliveEnemiesCount == maxAliveEnemies)
             {
                 return;
             }
             
-            float time = Time.fixedTime;
-            if (time - lastSpawnTime < currentSpawnCooldown)
+            if (Time.fixedTime - lastSpawnTime < currentSpawnCooldown)
                 return;
 
             SpawnEnemy();
@@ -85,6 +89,7 @@ namespace Game.Controllers
             enemy.OnDead += DespawnEnemy;
             gameController.OnGameOver += enemy.ForbidActions;
             OnEnemySpawned?.Invoke(enemy);
+            currentAliveEnemiesCount++;
             return enemy;
         }
 
@@ -98,6 +103,7 @@ namespace Game.Controllers
             yield return null;
             enemiesPool.ReleaseObject(enemy);
             gameController.OnGameOver += enemy.ForbidActions;
+            currentAliveEnemiesCount--;
         }
         
         private void ResetSpawnCooldown()

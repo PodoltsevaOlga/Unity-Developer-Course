@@ -60,8 +60,7 @@ namespace Game.Characters.CharacterComponents
         public bool IsReachedDestination(out Vector2 remainingDistance)
         {
             remainingDistance = currentDestination.Value - (Vector2)rigidbody.transform.position;
-            return Mathf.Abs(remainingDistance.sqrMagnitude -
-                             stoppingDistance * stoppingDistance) < movementPrecision;
+            return remainingDistance.sqrMagnitude < stoppingDistance * stoppingDistance;
         }
 
         public void OnFixedUpdate()

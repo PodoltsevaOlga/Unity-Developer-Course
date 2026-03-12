@@ -19,7 +19,6 @@ namespace Game.Projectiles
         [SerializeField] 
         private ProjectileStatConfig projectileStatConfig;
         
-        [SerializeField]
         private Transform projectilesContainer;
         
         [SerializeField]
@@ -35,6 +34,8 @@ namespace Game.Projectiles
 
         private void Awake()
         {
+            projectilesContainer = new GameObject().transform;
+            projectilesContainer.gameObject.name = $"{this.name} container";
             projectilePool = new ObjectPool<Projectile>(projectilePrefab, projectilesContainer, 5);
         }
 
@@ -55,7 +56,7 @@ namespace Game.Projectiles
             owner = _owner;
         }
 
-        public bool TryToFire(Vector3 targetPosition)
+        public bool TryToFire(Vector3? targetPosition)
         {
             if (Time.time - lastFireTime < fireCooldown)
             {
@@ -68,13 +69,20 @@ namespace Game.Projectiles
             return true;
         }
 
-        private void SpawnProjectile(Vector3 targetPosition)
+        private void SpawnProjectile(Vector3? targetPosition)
         {
             var projectile = projectilePool.GetObject();
             projectile.transform.SetParent(projectilesContainer);
             projectile.transform.position = firePoint.position;
             projectile.Setup(projectileStatConfig, owner.Faction);
-            projectile.SetDirection(targetPosition - firePoint.position);
+            if (targetPosition == null)
+            {
+                projectile.SetDirection(Vector2.up);
+            }
+            else
+            {
+                projectile.SetDirection(targetPosition.Value - firePoint.position);
+            }
             projectile.gameObject.SetActive(true);
             switch (owner.Faction)
             {

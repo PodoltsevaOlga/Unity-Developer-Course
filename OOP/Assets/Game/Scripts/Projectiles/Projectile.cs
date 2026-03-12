@@ -64,7 +64,7 @@ namespace Game.Projectiles
         
         public void SetDirection(Vector2 _direction)
         {
-            direction = _direction;
+            direction = _direction.normalized;
         }
 
         private void Move()
