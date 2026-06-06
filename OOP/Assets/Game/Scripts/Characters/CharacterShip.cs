@@ -35,7 +35,7 @@ namespace Game.Characters
             movementAgent = new MovementAgent(shipRigidbody, statConfiguration.MoveSpeed,
                 statConfiguration.MoveRotationAngle, statConfiguration.StoppingDistance,
                 allowedArea);
-            weapon.Setup(this);
+            weapon.Setup(CharacterFaction);
             OnAwake();
         }
 

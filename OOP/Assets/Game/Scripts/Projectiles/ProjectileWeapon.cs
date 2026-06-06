@@ -12,48 +12,24 @@ namespace Game.Projectiles
     {
         [SerializeField]
         private float fireCooldown = 1.25f;
-        
-        [SerializeField]
-        private Projectile projectilePrefab;
 
         [SerializeField] 
         private ProjectileStatConfig projectileStatConfig;
-        
-        private Transform projectilesContainer;
+
+        [SerializeField] 
+        private ProjectileSpawner projectileSpawner;
         
         [SerializeField]
         private Transform firePoint;
 
         private float lastFireTime;
-        private CharacterShip owner;
-        private ObjectPool<Projectile> projectilePool;
-        private readonly HashSet<Projectile> activeProjectiles = new();
-
+        
+        private Faction ownerFaction;
         public event Action OnFire;
 
-
-        private void Awake()
+        public void Setup(Faction _ownerFaction)
         {
-            projectilesContainer = new GameObject().transform;
-            projectilesContainer.gameObject.name = $"{this.name} container";
-            projectilePool = new ObjectPool<Projectile>(projectilePrefab, projectilesContainer, 5);
-        }
-
-        private void OnDestroy()
-        {
-            foreach (var projectile in activeProjectiles)
-            {
-                projectile.OnDealDamage -= DespawnProjectile;
-                projectile.OnOutOfCameraView -= DespawnProjectile;
-
-                projectile.OnDealDamage += projectile.DestroyMyself;
-                projectile.OnOutOfCameraView += projectile.DestroyMyself;
-            }
-        }
-
-        public void Setup(CharacterShip _owner)
-        {
-            owner = _owner;
+            ownerFaction = _ownerFaction;
         }
 
         public bool TryToFire(Vector3? targetPosition)
@@ -62,48 +38,19 @@ namespace Game.Projectiles
             {
                 return false;
             }
+            
+            if (projectileSpawner == null)
+            {
+                Debug.LogWarning($"projectile spawner in weapon {this.name} is null");
+                return false;
+            }
 
-            SpawnProjectile(targetPosition);
+            projectileSpawner.SpawnProjectile(projectileStatConfig,
+                ownerFaction, firePoint.position, targetPosition);
+
             OnFire?.Invoke();
             lastFireTime = Time.time;
             return true;
-        }
-
-        private void SpawnProjectile(Vector3? targetPosition)
-        {
-            var projectile = projectilePool.GetObject();
-            projectile.transform.SetParent(projectilesContainer);
-            projectile.transform.position = firePoint.position;
-            projectile.Setup(projectileStatConfig, owner.Faction);
-            if (targetPosition == null)
-            {
-                projectile.SetDirection(Vector2.up);
-            }
-            else
-            {
-                projectile.SetDirection(targetPosition.Value - firePoint.position);
-            }
-            projectile.gameObject.SetActive(true);
-            switch (owner.Faction)
-            {
-                case Faction.Enemy:
-                    projectile.gameObject.layer = (int)PhysicsLayer.ENEMY_PROJECTILE;
-                    break;
-                case Faction.Player:
-                    projectile.gameObject.layer = (int)PhysicsLayer.PLAYER_PROJECTILE;
-                    break;
-            }
-            
-            projectile.OnDealDamage += DespawnProjectile;
-            projectile.OnOutOfCameraView += DespawnProjectile;
-            
-            activeProjectiles.Add(projectile);
-        }
-
-        private void DespawnProjectile(Projectile projectile)
-        {
-            projectilePool.ReleaseObject(projectile);
-            activeProjectiles.Remove(projectile);
         }
 
         public void ResetValues()

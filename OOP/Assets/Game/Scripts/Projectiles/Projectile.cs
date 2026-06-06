@@ -9,31 +9,24 @@ namespace Game.Projectiles
     [RequireComponent(typeof(Collider2D))]
     public class Projectile : MonoBehaviour, IPoolableObject
     {
-        [SerializeField] 
-        private float outOfCameraViewDistance = 0.5f;
         public event Action<Projectile> OnDealDamage;
-        public event Action<Projectile> OnOutOfCameraView;
+
+        private ProjectileStatConfig statConfig;
         
         public Faction OwnerFaction { get; private set; } = Faction.None;
-
-        private int damage;
-        private float speed;
+        
         private Vector2 direction;
 
-        public void Setup(ProjectileStatConfig statConfig, Faction ownerFaction)
+        public void Setup(ProjectileStatConfig _statConfig, Faction ownerFaction)
         {
-            damage = statConfig.Damage;
-            speed = statConfig.Speed;
+            statConfig = _statConfig;
             OwnerFaction = ownerFaction;
+            gameObject.layer = FactionToPhysicsLayerResolver.Resolve(ownerFaction);
         }
         
         private void FixedUpdate()
         {
             Move();
-            if (CheckIsOutOfCameraView())
-            {
-                OnOutOfCameraView?.Invoke(this);
-            }
         }
 
         private void OnTriggerEnter2D(Collider2D other)
@@ -45,7 +38,7 @@ namespace Game.Projectiles
                 receiver.Faction != Faction.None &&
                 OwnerFaction != receiver.Faction)
             {
-                receiver.ReceiveDamage(damage);
+                receiver.ReceiveDamage(statConfig.Damage);
                 OnDealDamage?.Invoke(this);
             }
         }
@@ -69,17 +62,8 @@ namespace Game.Projectiles
 
         private void Move()
         {
-            Vector3 moveStep = (Vector3)direction * (speed * Time.fixedDeltaTime);
+            Vector3 moveStep = (Vector3)direction * (statConfig.Speed * Time.fixedDeltaTime);
             transform.position += moveStep;
-        }
-
-        private bool CheckIsOutOfCameraView()
-        {
-            var viewPos = Camera.main.WorldToViewportPoint(transform.position);
-            return (viewPos.x < -outOfCameraViewDistance ||
-                    viewPos.x > 1 + outOfCameraViewDistance) ||
-                   (viewPos.y < -outOfCameraViewDistance ||
-                    viewPos.y > 1 + outOfCameraViewDistance);
         }
     }
 }

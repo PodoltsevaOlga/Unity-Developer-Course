@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using Game.Characters;
 using Game.Utils;
-using Modules.Utils;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -23,10 +23,7 @@ namespace Game.Controllers
         private int maxAliveEnemies = 5;
         
         [SerializeField]
-        private Transform[] spawnPositions;
-        
-        [SerializeField]
-        private Transform[] attackPositions;
+        private EnemyPositionProvider positionProvider;
 
         [SerializeField] 
         private Transform spawnContainer;
@@ -39,31 +36,27 @@ namespace Game.Controllers
 
         private float currentSpawnCooldown;
         private float lastSpawnTime;
-        private int currentSpawnPositionIndex;
-        private int currentAttackPositionIndex;
-        private int currentAliveEnemiesCount;
 
         private bool canSpawn;
 
         private ObjectPool<Enemy> enemiesPool = null;
+        private List<Enemy> aliveEnemies = new();
+        private int currentAliveEnemiesCount => aliveEnemies.Count;
 
         public event Action<Enemy> OnEnemySpawned;
 
         private void Awake()
         {
             enemiesPool = new ObjectPool<Enemy>(enemyPrefab, spawnContainer, maxAliveEnemies);
-            
-            ShuffleSpawnPositions();
-            ShuffleAttackPositions();
-            
             canSpawn = true;
-            currentAliveEnemiesCount = 0;
-            gameController.OnGameOver += () => canSpawn = false;
+            aliveEnemies.Clear();
+            gameController.OnGameOver += OnGameOver;
         }
         
         private void Start()
         {
             ResetSpawnCooldown();
+            positionProvider.Reset();
         }
 
         private void FixedUpdate()
@@ -80,17 +73,35 @@ namespace Game.Controllers
             ResetSpawnCooldown();
         }
 
+        private void OnDestroy()
+        {
+            gameController.OnGameOver -= OnGameOver;
+            foreach (var enemy in aliveEnemies)
+            {
+                enemy.OnDead -= DespawnEnemy;
+            }
+        }
+
         private Enemy SpawnEnemy()
         {
             var enemy = enemiesPool.GetObject();
-            enemy.transform.position = NextSpawnPosition();
+            enemy.transform.position = positionProvider.NextSpawnPosition();
             enemy.gameObject.SetActive(true);
-            enemy.Setup(player, NextAttackPosition());
+            enemy.Setup(player, positionProvider.NextAttackPosition());
             enemy.OnDead += DespawnEnemy;
-            gameController.OnGameOver += enemy.ForbidActions;
             OnEnemySpawned?.Invoke(enemy);
-            currentAliveEnemiesCount++;
+            aliveEnemies.Add(enemy);
             return enemy;
+        }
+
+        private void OnGameOver()
+        {
+            canSpawn = false;
+            foreach (var enemy in aliveEnemies)
+            {
+                enemy.ForbidActions();
+            }
+            gameController.OnGameOver -= OnGameOver;
         }
 
         private void DespawnEnemy(Enemy enemy)
@@ -102,46 +113,14 @@ namespace Game.Controllers
         {
             yield return null;
             enemiesPool.ReleaseObject(enemy);
-            gameController.OnGameOver += enemy.ForbidActions;
-            currentAliveEnemiesCount--;
+            enemy.OnDead -= DespawnEnemy;
+            aliveEnemies.Remove(enemy);
         }
         
         private void ResetSpawnCooldown()
         {
             currentSpawnCooldown = Random.Range(minSpawnCooldown, maxSpawnCooldown);
             lastSpawnTime = Time.fixedTime;
-        }
-
-        private void ShuffleSpawnPositions()
-        {
-            spawnPositions.Shuffle();
-            currentSpawnPositionIndex = 0;
-        }
-        
-        private void ShuffleAttackPositions()
-        {
-            attackPositions.Shuffle();
-            currentAttackPositionIndex = 0;
-        }
-        
-        private Vector3 NextSpawnPosition()
-        {
-            if (currentSpawnPositionIndex >= spawnPositions.Length)
-            {
-                ShuffleSpawnPositions();
-            }
-
-            return spawnPositions[currentSpawnPositionIndex++].position;
-        }
-        
-        private Vector3 NextAttackPosition()
-        {
-            if (currentAttackPositionIndex >= attackPositions.Length)
-            {
-                ShuffleAttackPositions();
-            }
-
-            return attackPositions[currentAttackPositionIndex++].position;
         }
     }
 }
