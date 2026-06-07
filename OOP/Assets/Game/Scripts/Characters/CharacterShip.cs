@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections;
 using Game.Characters.CharacterComponents;
 using Game.Projectiles;
-using Modules.Utils;
 using UnityEngine;
 
 namespace Game.Characters
@@ -15,9 +13,6 @@ namespace Game.Characters
         protected CharacterShipStatConfig statConfiguration;
         [SerializeField] 
         protected Rigidbody2D shipRigidbody;
-        [SerializeField] 
-        protected TransformBounds allowedArea;
-        
         public virtual Faction CharacterFaction => Faction.None;
 
         protected Health health;
@@ -41,24 +36,6 @@ namespace Game.Characters
         {
         }
         
-        private void FixedUpdate()
-        {
-            OnFixedUpdate();
-        }
-
-        protected virtual void OnFixedUpdate()
-        {
-        }
-
-        private void LateUpdate()
-        {
-            OnLateUpdate();
-        }
-        
-        protected virtual void OnLateUpdate()
-        {
-        }
-
         public void ReceiveDamage(int damage)
         {
             if (health.ApplyDamage(damage))
@@ -77,20 +54,12 @@ namespace Game.Characters
 
         protected virtual void OnDying()
         {
-            StartCoroutine(DisableNextFrame());
-        }
-        
-        private IEnumerator DisableNextFrame()
-        {
-            yield return null;
-            yield return null;
-            gameObject.SetActive(false);
         }
 
         private void Die()
         {
-            OnDying();
             OnDead?.Invoke(this);
+            OnDying();
         }
     }
 }

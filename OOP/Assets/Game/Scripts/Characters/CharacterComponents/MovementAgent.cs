@@ -36,7 +36,7 @@ namespace Game.Characters.CharacterComponents
                 direction.y = 0f;
             }
             
-            currentDirection = direction;
+            currentDirection = direction.normalized;
             
         }
         

@@ -53,7 +53,6 @@ MonoBehaviour:
   weapon: {fileID: 2740268529391100273}
   statConfiguration: {fileID: 11400000, guid: f80b1f70ff4d9d24ca230e92a311ab9b, type: 2}
   shipRigidbody: {fileID: 8143234720914643918}
-  allowedArea: {fileID: 0}
 --- !u!114 &2402643487650453896
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -67,6 +66,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Game::Game.Characters.CharacterShipView
   viewConfiguration: {fileID: 11400000, guid: f6ecf0b3d1d004b3893cc42c64995303, type: 2}
+  characterShipData: {fileID: 102605417607457000}
+  visualRoot: {fileID: 2570692159425164225}
   viewRenderer: {fileID: 1333951631294404335}
   damageSFX: {fileID: 0}
   audioSource: {fileID: 918013660520932640}

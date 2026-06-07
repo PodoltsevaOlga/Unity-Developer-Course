@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using Game.Characters;
+using Game.Projectiles;
 using Game.Utils;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -10,29 +11,32 @@ namespace Game.Controllers
 {
     public class EnemySpawner : MonoBehaviour
     {
-        [SerializeField] 
+        [SerializeField]
         private Enemy enemyPrefab;
-        
+
         [SerializeField]
         private float minSpawnCooldown = 2;
 
         [SerializeField]
         private float maxSpawnCooldown = 3;
 
-        [SerializeField] 
+        [SerializeField]
         private int maxAliveEnemies = 5;
-        
+
         [SerializeField]
         private EnemyPositionProvider positionProvider;
 
-        [SerializeField] 
+        [SerializeField]
         private Transform spawnContainer;
-        
-        [SerializeField] 
+
+        [SerializeField]
         private Player player;
 
-        [SerializeField] 
+        [SerializeField]
         private GameController gameController;
+
+        [SerializeField]
+        private ProjectileSpawner projectileSpawner;
 
         private float currentSpawnCooldown;
         private float lastSpawnTime;
@@ -53,7 +57,7 @@ namespace Game.Controllers
             aliveEnemies.Clear();
             gameController.OnGameOver += OnGameOver;
         }
-        
+
         private void Start()
         {
             ResetSpawnCooldown();
@@ -66,7 +70,7 @@ namespace Game.Controllers
             {
                 return;
             }
-            
+
             if (Time.fixedTime - lastSpawnTime < currentSpawnCooldown)
                 return;
 
@@ -79,7 +83,7 @@ namespace Game.Controllers
             gameController.OnGameOver -= OnGameOver;
             foreach (var enemy in aliveEnemies)
             {
-                enemy.OnDead -= DespawnEnemy;
+                enemy.OnEnemyDead -= DespawnEnemyByDeath;
             }
         }
 
@@ -88,8 +92,8 @@ namespace Game.Controllers
             var enemy = enemiesPool.GetObject();
             enemy.transform.position = positionProvider.NextSpawnPosition();
             enemy.gameObject.SetActive(true);
-            enemy.Setup(player, positionProvider.NextAttackPosition());
-            enemy.OnDead += DespawnEnemy;
+            enemy.Setup(player, positionProvider.NextAttackPosition(), projectileSpawner);
+            enemy.OnEnemyDead += DespawnEnemyByDeath;
             OnEnemySpawned?.Invoke(enemy);
             aliveEnemies.Add(enemy);
             return enemy;
@@ -105,23 +109,20 @@ namespace Game.Controllers
             gameController.OnGameOver -= OnGameOver;
         }
 
-        private void DespawnEnemy(Enemy enemy, bool byDeath)
+        private void DespawnEnemyByDeath(Enemy enemy)
         {
-            StartCoroutine(DespawnInNextFrame(enemy, byDeath));
+            StartCoroutine(DespawnInNextFrame(enemy));
         }
 
-        private IEnumerator DespawnInNextFrame(Enemy enemy, bool byDeath)
+        private IEnumerator DespawnInNextFrame(Enemy enemy)
         {
             yield return null;
-            enemy.OnDead -= DespawnEnemy;
-            if (byDeath)
-            {
-                OnEnemyKilled?.Invoke(enemy);
-            }
+            enemy.OnEnemyDead -= DespawnEnemyByDeath;
+            OnEnemyKilled?.Invoke(enemy);
             aliveEnemies.Remove(enemy);
             enemiesPool.ReleaseObject(enemy);
         }
-        
+
         private void ResetSpawnCooldown()
         {
             currentSpawnCooldown = Random.Range(minSpawnCooldown, maxSpawnCooldown);

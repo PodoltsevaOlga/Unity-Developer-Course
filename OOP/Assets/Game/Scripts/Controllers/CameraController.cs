@@ -1,5 +1,4 @@
-﻿using System;
-using Game.Characters;
+﻿using Game.Characters;
 using Modules.Utils;
 using UnityEngine;
 

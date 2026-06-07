@@ -8,7 +8,6 @@ namespace Game.Controllers
     {
         public bool IsGameActive { get; private set; }
         public event Action OnGameOver;
-        
         public event Action OnGameStart;
 
         [SerializeField] 
@@ -21,7 +20,7 @@ namespace Game.Controllers
         {
             if (player != null)
             {
-                player.OnDead += OnPlayerDied;
+                player.OnPlayerDead += OnPlayerDied;
             }
 
             StartGame();
@@ -34,9 +33,9 @@ namespace Game.Controllers
             OnGameStart?.Invoke();
         }
 
-        private void OnPlayerDied(CharacterShip _)
+        private void OnPlayerDied()
         {
-            player.OnDead -= OnPlayerDied;
+            player.OnPlayerDead -= OnPlayerDied;
             GameOver();
         }
 

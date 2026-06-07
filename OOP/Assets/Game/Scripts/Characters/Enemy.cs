@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Game.Characters.CharacterComponents;
+using Game.Projectiles;
 using Game.Utils;
 using UnityEngine;
 
@@ -12,7 +13,7 @@ namespace Game.Characters
         public override Faction CharacterFaction => Faction.Enemy;
         
         private List<IResetComponent> resetComponents = new();
-        public new event Action<Enemy, bool> OnDead;
+        public event Action<Enemy> OnEnemyDead;
         
         private bool canMakeActions;
 
@@ -30,8 +31,6 @@ namespace Game.Characters
             resetComponents.Add(health);
             resetComponents.Add(weapon);
             resetComponents.Add(destinationComponent);
-            
-            base.OnDead += (character) => { (character as Enemy)?.OnDead?.Invoke((Enemy)character, true); };
         }
 
         public void ForbidActions()
@@ -39,14 +38,16 @@ namespace Game.Characters
             canMakeActions = false;
         }
 
-        public void Setup(CharacterShip targetCharacterShip, Vector2 destinationPosition)
+        public void Setup(CharacterShip targetCharacterShip, Vector2 destinationPosition,
+            ProjectileSpawner projectileSpawner)
         {
             Target = targetCharacterShip;
             destinationComponent.SetDestination(destinationPosition);
             canMakeActions = true;
+            weapon.SetProjectileSpawner(projectileSpawner);
         }
 
-        protected override void OnFixedUpdate()
+        private void FixedUpdate()
         {
             if (!canMakeActions || Target == null || !Target.IsAlive)
             {
@@ -69,6 +70,12 @@ namespace Game.Characters
             {
                 resetComponent.ResetValues();
             }
+        }
+
+        protected override void OnDying()
+        {
+            base.OnDying();
+            OnEnemyDead?.Invoke(this);
         }
     }
 }

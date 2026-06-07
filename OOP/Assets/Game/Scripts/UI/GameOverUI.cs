@@ -1,5 +1,4 @@
-﻿using System;
-using Game.Controllers;
+﻿using Game.Controllers;
 using Modules.UI;
 using UnityEngine;
 

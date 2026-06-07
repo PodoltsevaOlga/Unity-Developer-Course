@@ -23,6 +23,7 @@ namespace Game.Projectiles
         {
             projectilesContainer = new GameObject().transform;
             projectilesContainer.gameObject.name = $"{name} container";
+            projectilesContainer.transform.parent = gameObject.transform;
             projectilePool = new ObjectPool<Projectile>(projectilePrefab, projectilesContainer, 5);
         }
         

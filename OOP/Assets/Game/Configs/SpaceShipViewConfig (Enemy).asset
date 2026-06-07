@@ -13,6 +13,8 @@ MonoBehaviour:
   m_Name: SpaceShipViewConfig (Enemy)
   m_EditorClassIdentifier: Game::Game.SpaceShipViewConfig
   <MaterialPrefab>k__BackingField: {fileID: 2100000, guid: 9230c0065227c1b4da624a6d952f0ce2, type: 2}
+  <MoveRotationAngle>k__BackingField: 30
+  <MoveRotationSpeed>k__BackingField: 5
   <HitAnimationCurve>k__BackingField:
     serializedVersion: 2
     m_Curve:
@@ -48,6 +50,4 @@ MonoBehaviour:
     m_RotationOrder: 4
   <HitPropertyName>k__BackingField: _HitBlend
   <HitDuration>k__BackingField: 0.2
-  <MoveRotationAngle>k__BackingField: 30
-  <MoveSpeed>k__BackingField: 5
   <DestroyEffectPrefab>k__BackingField: {fileID: 198423008863891152, guid: 91acdbd2820f9ce418996a0a24d91079, type: 3}

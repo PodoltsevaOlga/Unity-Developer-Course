@@ -1,5 +1,4 @@
-﻿using Modules.Utils;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Game.Characters
 {

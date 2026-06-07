@@ -9,6 +9,7 @@ namespace Game.Utils
         private readonly Stack<T> objects = new Stack<T>();
         private readonly T objectPrefab;
         private readonly Transform container;
+        private int instantiatedCount = 0;
 
         public ObjectPool(T prefab, Transform containerTransform, int initialSize = 10)
         {
@@ -25,6 +26,8 @@ namespace Game.Utils
         {
             var newObj = GameObject.Instantiate(objectPrefab, container);
             newObj.gameObject.SetActive(false);
+            newObj.name = newObj.name + instantiatedCount.ToString();
+            instantiatedCount++;
             objects.Push(newObj);
         }
 
@@ -35,7 +38,6 @@ namespace Game.Utils
                 InstantiateObject();
             }
             var obj = objects.Pop();
-            obj.transform.SetParent(null);
             obj.OnActivate();
             return obj;
         }
@@ -48,7 +50,6 @@ namespace Game.Utils
             }
             objects.Push(obj);
             obj.gameObject.SetActive(false);
-            obj.transform.SetParent(container);
         }
     }
 }

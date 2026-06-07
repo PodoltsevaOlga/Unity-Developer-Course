@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using Game.Characters;
 using Game.Characters.CharacterComponents;
-using Game.Utils;
 using UnityEngine;
 
 namespace Game.Projectiles
@@ -16,7 +14,6 @@ namespace Game.Projectiles
         [SerializeField] 
         private ProjectileStatConfig projectileStatConfig;
 
-        [SerializeField] 
         private ProjectileSpawner projectileSpawner;
         
         [SerializeField]
@@ -30,6 +27,11 @@ namespace Game.Projectiles
         public void Setup(Faction _ownerFaction)
         {
             ownerFaction = _ownerFaction;
+        }
+
+        public void SetProjectileSpawner(ProjectileSpawner _projectileSpawner)
+        {
+            projectileSpawner = _projectileSpawner;
         }
 
         public bool TryToFire(Vector3? targetPosition)
