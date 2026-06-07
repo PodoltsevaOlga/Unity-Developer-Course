@@ -7,7 +7,7 @@ namespace Game.UI
     public class ScoreUI : MonoBehaviour
     {
         [SerializeField] 
-        private GameController gameController;
+        private ScoreCounter scoreCounter;
 
         [SerializeField] 
         private ScoreView scoreView;
@@ -19,12 +19,12 @@ namespace Game.UI
         
         private void OnEnable()
         {
-            gameController.OnScoreChanged += OnScoreChanged;
+            scoreCounter.OnScoreChanged += OnScoreChanged;
         }
         
         private void OnDisable()
         {
-            gameController.OnScoreChanged -= OnScoreChanged;
+            scoreCounter.OnScoreChanged -= OnScoreChanged;
         }
 
         private void OnScoreChanged(int newValue)

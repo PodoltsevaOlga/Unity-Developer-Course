@@ -15,9 +15,6 @@ namespace Game.Characters
         public float MoveSpeed { get; private set; }
 
         [field: SerializeField]
-        public float MoveRotationAngle { get; private set; }
-        
-        [field: SerializeField]
         public float StoppingDistance { get; private set; }= 0.25f;
     }
 }

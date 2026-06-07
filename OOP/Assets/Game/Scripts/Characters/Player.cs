@@ -1,10 +1,17 @@
-﻿using UnityEngine;
+﻿using Game.Characters.CharacterComponents;
+using UnityEngine;
 
 namespace Game.Characters
 {
     public sealed class Player : CharacterShip
     {
         public override Faction CharacterFaction => Faction.Player;
+        private BoundsLimiterComponent boundsLimiter;
+
+        protected override void OnAwake()
+        {
+            boundsLimiter = new BoundsLimiterComponent(allowedArea, shipRigidbody);
+        }
         
         public void RequestFire()
         {
@@ -16,14 +23,14 @@ namespace Game.Characters
             movementAgent.SetDirection(direction);
         }
 
-        protected override void OnLateUpdate()
-        {
-            movementAgent.OnLateUpdate();
-        }
-        
         protected override void OnFixedUpdate()
         {
-            movementAgent.OnFixedUpdate();
+            movementAgent.MoveOnFixedUpdate();
+        }
+        
+        protected override void OnLateUpdate()
+        {
+            boundsLimiter.ApplyLimitToPosition();
         }
     }
 }

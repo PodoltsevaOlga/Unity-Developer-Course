@@ -6,12 +6,13 @@ namespace Game.Characters
     [RequireComponent(typeof(CharacterShip))]
     public class CharacterShipView : MonoBehaviour
     {
-        private CharacterShip characterShipData;
         private Material material;
         private Tweener damageAnimation;
         
         [SerializeField]
         private CharacterShipViewConfig viewConfiguration;
+        [SerializeField]
+        private CharacterShip characterShipData;
         [SerializeField]
         private Renderer viewRenderer;
         [SerializeField]
@@ -21,7 +22,6 @@ namespace Game.Characters
         
         private void Awake()
         {
-            characterShipData = GetComponent<CharacterShip>();
             material = new Material(viewConfiguration.MaterialPrefab);
             viewRenderer.material = material;
         }
@@ -38,6 +38,24 @@ namespace Game.Characters
             characterShipData.OnDead -= AnimateDeath;
         }
 
+        private void LateUpdate()
+        {
+            AnimateMovement(Time.deltaTime);
+        }
+
+        private void AnimateMovement(float deltaTime)
+        {
+            Vector2 lastMovement = characterShipData.GetLastMovement();
+            Vector3 shipAngles = transform.localEulerAngles;
+            shipAngles.x = viewConfiguration.MoveRotationAngle * lastMovement.y;
+            shipAngles.y = viewConfiguration.MoveRotationAngle / 2 * lastMovement.x * -1f;
+            
+            Quaternion shipRotation = Quaternion.Euler(shipAngles);
+            float t = viewConfiguration.MoveRotationSpeed * deltaTime;
+            transform.localRotation =
+                Quaternion.Lerp(transform.localRotation, shipRotation, t);
+        }
+        
         private void AnimateDamage(int _)
         {
             if (damageAnimation.IsActive())

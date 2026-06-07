@@ -8,54 +8,36 @@ namespace Game.Controllers
     {
         public bool IsGameActive { get; private set; }
         public event Action OnGameOver;
-        public event Action<int> OnScoreChanged;
+        
         public event Action OnGameStart;
 
         [SerializeField] 
         private Player player;
 
         [SerializeField] 
-        private EnemySpawner enemySpawner;
-
-        public int Score { get; private set; }
+        private ScoreCounter scoreCounter;
 
         private void Start()
         {
             if (player != null)
             {
-                player.OnDead += OnCharacterDie;
+                player.OnDead += OnPlayerDied;
             }
 
-            if (enemySpawner != null)
-            {
-                enemySpawner.OnEnemySpawned += delegate(Enemy enemy)
-                {
-                    enemy.OnDead += OnCharacterDie;
-                };
-            }
-            
             StartGame();
         }
 
         private void StartGame()
         {
             IsGameActive = true;
-            Score = 0;
+            scoreCounter.Reset();
             OnGameStart?.Invoke();
         }
 
-        private void OnCharacterDie(CharacterShip characterShip)
+        private void OnPlayerDied(CharacterShip _)
         {
-            if (characterShip == player)
-            {
-                player.OnDead -= OnCharacterDie;
-                GameOver();
-            }
-            else if (characterShip.CharacterFaction == Faction.Enemy)
-            {
-                Score++;
-                OnScoreChanged?.Invoke(Score);
-            }
+            player.OnDead -= OnPlayerDied;
+            GameOver();
         }
 
         private void GameOver()
@@ -63,7 +45,5 @@ namespace Game.Controllers
             IsGameActive = false;
             OnGameOver?.Invoke();
         }
-        
-        
     }
 }

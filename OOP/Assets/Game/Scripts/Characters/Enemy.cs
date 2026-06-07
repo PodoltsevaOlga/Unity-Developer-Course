@@ -12,9 +12,11 @@ namespace Game.Characters
         public override Faction CharacterFaction => Faction.Enemy;
         
         private List<IResetComponent> resetComponents = new();
-        public new event Action<Enemy> OnDead;
+        public new event Action<Enemy, bool> OnDead;
         
         private bool canMakeActions;
+
+        private DestinationComponent destinationComponent;
 
         protected override void OnAwake()
         {
@@ -23,10 +25,13 @@ namespace Game.Characters
             {
                 resetComponents.AddRange(resetComps);
             }
+
+            destinationComponent = new(statConfiguration.StoppingDistance);
             resetComponents.Add(health);
             resetComponents.Add(weapon);
+            resetComponents.Add(destinationComponent);
             
-            base.OnDead += (character) => { (character as Enemy)?.OnDead?.Invoke((Enemy)character); };
+            base.OnDead += (character) => { (character as Enemy)?.OnDead?.Invoke((Enemy)character, true); };
         }
 
         public void ForbidActions()
@@ -37,7 +42,7 @@ namespace Game.Characters
         public void Setup(CharacterShip targetCharacterShip, Vector2 destinationPosition)
         {
             Target = targetCharacterShip;
-            movementAgent.SetDestination(destinationPosition);
+            destinationComponent.SetDestination(destinationPosition);
             canMakeActions = true;
         }
 
@@ -47,10 +52,12 @@ namespace Game.Characters
             {
                 return;
             }
-            
-            movementAgent.OnFixedUpdate();
 
-            if (movementAgent.IsReachedDestination(out var _))
+            var currMove = destinationComponent.CalculateMovementVector(transform.position);
+            movementAgent.SetDirection(currMove);
+            movementAgent.MoveOnFixedUpdate();
+
+            if (destinationComponent.IsReachedDestination(transform.position))
             {
                 weapon.TryToFire(Target.transform.position);
             }

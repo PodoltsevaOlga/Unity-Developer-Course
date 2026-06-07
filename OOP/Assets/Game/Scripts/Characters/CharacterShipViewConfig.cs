@@ -7,6 +7,12 @@ namespace Game.Characters
     {
         [field: SerializeField]
         public Material MaterialPrefab { get; private set; }
+        
+        [Header("Movement tilt")]
+        [field: SerializeField]
+        public float MoveRotationAngle { get; private set; }
+        [field: SerializeField]
+        public float MoveRotationSpeed { get; private set; }
 
         [Header("Damage")]
         [field: SerializeField]

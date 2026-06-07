@@ -32,9 +32,7 @@ namespace Game.Characters
         private void Awake()
         {
             health = new Health(statConfiguration.MaxHealth);
-            movementAgent = new MovementAgent(shipRigidbody, statConfiguration.MoveSpeed,
-                statConfiguration.MoveRotationAngle, statConfiguration.StoppingDistance,
-                allowedArea);
+            movementAgent = new MovementAgent(shipRigidbody, statConfiguration.MoveSpeed);
             weapon.Setup(CharacterFaction);
             OnAwake();
         }
@@ -72,6 +70,8 @@ namespace Game.Characters
                 }
             }
         }
+
+        public Vector2 GetLastMovement() => movementAgent.LastMovement;
 
         public Faction Faction => CharacterFaction;
 

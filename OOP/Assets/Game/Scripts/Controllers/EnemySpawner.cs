@@ -44,6 +44,7 @@ namespace Game.Controllers
         private int currentAliveEnemiesCount => aliveEnemies.Count;
 
         public event Action<Enemy> OnEnemySpawned;
+        public event Action<Enemy> OnEnemyKilled;
 
         private void Awake()
         {
@@ -104,17 +105,21 @@ namespace Game.Controllers
             gameController.OnGameOver -= OnGameOver;
         }
 
-        private void DespawnEnemy(Enemy enemy)
+        private void DespawnEnemy(Enemy enemy, bool byDeath)
         {
-            StartCoroutine(DespawnInNextFrame(enemy));
+            StartCoroutine(DespawnInNextFrame(enemy, byDeath));
         }
-        
-        private IEnumerator DespawnInNextFrame(Enemy enemy)
+
+        private IEnumerator DespawnInNextFrame(Enemy enemy, bool byDeath)
         {
             yield return null;
-            enemiesPool.ReleaseObject(enemy);
             enemy.OnDead -= DespawnEnemy;
+            if (byDeath)
+            {
+                OnEnemyKilled?.Invoke(enemy);
+            }
             aliveEnemies.Remove(enemy);
+            enemiesPool.ReleaseObject(enemy);
         }
         
         private void ResetSpawnCooldown()
